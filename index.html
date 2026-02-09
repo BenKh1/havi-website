@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mechina Live Feed</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; direction: rtl; }
+        .message { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .time { font-size: 0.8em; color: #888; }
+        .sender { font-weight: bold; color: #075E54; }
+        h1 { text-align: center; color: #25D366; }
+    </style>
+</head>
+<body>
+    <h1>Mechina Live WhatsApp Feed</h1>
+    <div id="feed">Loading messages...</div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxI7aPBR95JeoA_qyhBBkLWFCggd5VpgJDyOgZqEuPAAn_yKU1DhhwLNc6RygG95lo58Q/exec";
+
+        async function loadMessages() {
+            const response = await fetch(GOOGLE_SCRIPT_URL);
+            const data = await response.json();
+            const feed = document.getElementById('feed');
+            feed.innerHTML = ''; // Clear loading text
+
+            // Reverse data so newest is on top
+            data.reverse().forEach(row => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message';
+                msgDiv.innerHTML = `
+                    <div class="sender">${row[1]}</div>
+                    <div>${row[2]}</div>
+                    <div class="time">${new Date(row[0]).toLocaleString()}</div>
+                `;
+                feed.appendChild(msgDiv);
+            });
+        }
+
+        loadMessages();
+        setInterval(loadMessages, 30000); // Refresh every 30 seconds
+    </script>
+</body>
+</html>
